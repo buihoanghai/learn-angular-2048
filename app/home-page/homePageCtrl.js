@@ -80,7 +80,30 @@ angular.module('app').controller('app.home-page.homePageCtrl', ['$scope', '$docu
         }
         return false;
     }
+    //flow
+    // get all points have value
+    //each point
+    //// check it's possiable for move or merge  follow direct
+    // merge if same value follow direct
+    //move up when possiable follow direct
+    function getAllPointsHaveValue() {
+        var i, points = $scope.points, length = points.length;
+        for (i = 0; i < length; i++) {
+            if (points[i].value !== 0) {
+                
+            }
+        }
+    }
 
+    function checkPossiableForMoveOrMerge(direct) {
+        
+    }
+    function mergeValue(direct) {
+        
+    }
+    function move() {
+        //
+    }
     function arrowUp() {
         var i, points = $scope.points, length = points.length,tempPosition;
         for (i = 4; i < length; i++) {
