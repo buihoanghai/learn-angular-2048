@@ -1,6 +1,6 @@
 angular.module('app').controller('app.home-page.homePageCtrl', ['$scope', '$document', function ($scope, $document) {
-    $scope.title = "Hello word";
-    var valueNoneClass = "text-5-char value-none", tempPoints = 0;
+    var direct = 'top', canMove = false, valueNoneClass = "text-5-char value-none", tempPoints = 0;
+        $scope.gameOver = false;
     function getClassByValue(val) {
         var temp = valueNoneClass;
         if (val === 0) {
@@ -52,7 +52,6 @@ angular.module('app').controller('app.home-page.homePageCtrl', ['$scope', '$docu
     //// check it's possiable for move or merge  follow direct
     // merge if same value follow direct
     //move up when possiable follow direct
-    var direct = 'top';
     function getNextPositionFollowCurrentPostion(currentPosition, j) {
         switch (direct) {
             case 'top':
@@ -107,7 +106,39 @@ angular.module('app').controller('app.home-page.homePageCtrl', ['$scope', '$docu
                 return i + 1;
         }
     }
-    function run1() {
+    function checkRun() {
+        var i = 0, points = $scope.points, length = points.length, currentPostion = -1;
+        // check all points follow direct
+        //ex: direct:up => start =0
+        while (i < 16) {
+            currentPostion = getNextPositionFollowDirect(currentPostion);
+            if (points[currentPostion].value !== 0) {
+                console.log('currentPostion: ' + currentPostion);
+                for (var j = 1; j < 4; j++) {
+                    //calculate the next point follow direct
+                    //ex: position:15; direct:up -> next position: 11
+                    var nextPosition = getNextPositionFollowCurrentPostion(currentPostion, j);
+                    if (nextPosition < 0) {
+                        break;
+                    }
+                    //      console.log('nextPosition: ' + nextPosition);
+                    // merge if same value follow direct
+                    if (points[currentPostion].value === points[nextPosition].value && !points[nextPosition].calculated) {
+                        return true;
+                    }
+                    if (points[nextPosition].value !== 0) {
+                        break;
+                    }
+                    if (points[nextPosition].value === 0) {
+                        return true;
+                    }
+                }
+            }
+            i++;
+        }
+        return false;
+    }
+    function run() {
         var i = 0, points = $scope.points, length = points.length, currentPostion = -1;
         // check all points follow direct
         //ex: direct:up => start =0
@@ -123,33 +154,29 @@ angular.module('app').controller('app.home-page.homePageCtrl', ['$scope', '$docu
                     if (nextPosition < 0 ) {
                         break;
                     }
-              //      console.log('nextPosition: ' + nextPosition);
                     // merge if same value follow direct
                     if (points[currentPostion].value === points[nextPosition].value && !points[nextPosition].calculated) {
                         tempPoints += points[nextPosition].value = points[currentPostion].value * 2;
                         points[currentPostion].value = 0;
                         points[nextPosition].calculated = true;
+                        canMove = true;
                     }
                     if (points[nextPosition].value !== 0) {
                         break;
                     }
-                    //move
                     if (points[nextPosition].value === 0) {
                         tempPosition = nextPosition;
-                
                     }
                 }
                 if (tempPosition !== -1) {
                     points[tempPosition].value = points[currentPostion].value;
                     points[currentPostion].value = 0;
+                    canMove = true;
                 }
             }
             i++;
         }
     }
-
-
-
     function createNewPoints() {
         $scope.points = [];
         var length = 16;
@@ -171,23 +198,41 @@ angular.module('app').controller('app.home-page.homePageCtrl', ['$scope', '$docu
     }
     $scope.newGame = function () {
         $scope.score = 0;
+        $scope.gameOver = false;
         tempPoints = 0;
         createNewPoints();
         newRandom();
         newRandom();
-        newRandom();
-        newRandom();
-        newRandom();
-        newRandom();
-        //  newRandom();
         reCheckClassValues();
     }
+    function checkCanRunAnyDirect() {
+        var result = false;
+        direct = "left";
+        result = checkRun();
+        if (result)
+            return result;
+        direct = "top";
+        result = checkRun();
+        if (result)
+            return result;
+        direct = "left";
+        result = checkRun();
+        if (result)
+            return result;
+        direct = "bottom";
+        result = checkRun();
+        if (result)
+            return result;
+        return result;
+    }
     $document.on('keydown', function (event) {
-        console.log(event.keyCode);
+        if ($scope.gameOver)
+            return;
         var matched = false;
         switch (event.keyCode) {
             case 37:
                 direct = "left";
+                
                 matched = true;
                 break;
             case 38:
@@ -204,7 +249,15 @@ angular.module('app').controller('app.home-page.homePageCtrl', ['$scope', '$docu
                 break;
         }
         if (matched) {
-            run1();
+            run();
+            if (!checkCanRunAnyDirect()) {
+                //game over :))
+                $scope.gameOver = true;
+                $scope.$digest();
+                return;
+            }
+           
+            canMove = false;
             $scope.score += tempPoints;
             tempPoints = 0;
             newRandom();
@@ -213,8 +266,5 @@ angular.module('app').controller('app.home-page.homePageCtrl', ['$scope', '$docu
             $scope.$digest();
         }
     });
-
-
-
 }
 ]);

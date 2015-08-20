@@ -132,69 +132,16 @@
             height: 100%;
             position: relative;
         }
+        .game-over {
+            opacity: .5;
+        }
     </style>
     <div>Your point: {{score}}</div>
     <div class="container"  ng-keypress="keyPress($event)">
         <button ng-click="newGame()">New Game</button>
-        <div class="box-content">
+        <div class="box-content" ng-class="{'game-over':gameOver}">
             <div ng-repeat="item in points" class="box" ng-class="item.classes" ng-bind-html="item.value || '&#160;&#160;&#160;&#160;&#160;'"></div>
         </div>
-        <!--<div class="box-content">
-
-            <div class="box text-2-char value-64">
-                64
-            </div>
-
-            <div class="box text-3-char value-256">
-                256
-            </div>
-            <div class="box text-4-char value-2048">
-                2048
-            </div>
-            <div class="box text-4-char value-max">
-                4096
-            </div>
-            <div class="box text-1-char value-2">
-                2
-            </div>
-            <div class="box text-3-char value-512">
-                512
-            </div>
-            <div class="box text-1-char value-4">
-                4
-            </div>
-            <div class="box text-1-char value-8">
-                8
-            </div>
-            <div class="box  text-5-char value-none">
-                &#160;&#160;&#160;&#160;&#160;
-            </div>
-            <div class="box text-2-char value-16">
-                16
-            </div>
-            <div class="box text-2-char value-32">
-                32
-            </div>
-
-            <div class="box text-4-char value-1024">
-                1024
-            </div>
-
-            <div class="box text-4-char value-max">
-                8192
-            </div>
-            <div class="box text-3-char value-128">
-                128
-            </div>
-            <div class="box  text-5-char value-max">
-                16384
-            </div>
-            <div class="box  text-5-char value-max">
-                32768
-            </div>
-
-
-        </div>-->
     </div>
 
     <script src="scripts/angular.js"></script>
