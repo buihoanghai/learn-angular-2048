@@ -46,40 +46,6 @@ angular.module('app').controller('app.home-page.homePageCtrl', ['$scope', '$docu
             points[i].classes = getClassByValue(points[i].value);
         }
     }
-    function arrowLeft() {
-        var i, points = $scope.points, length = points.length;
-        for (i = 1; i < 4; i++) {
-            for (var j = 1; j < 4; j++) {
-                //case equal
-                if (points[i - 4].value === points[i].value) {
-                    points[i - 4].value = points[i].value * 2;
-                    tempPoints += points[i - 4].value * 2;
-                    points[i - 4].calculated = true;
-                } else {
-                    if (points[i - 4].value === 0) {
-                        points[i - 4].value = points[i].value;
-                        points[i].value = 0;
-                    }
-                }
-            }
-
-
-        }
-    }
-    function canArrowUp() {
-        var i, points = angular.copy($scope.points), length = points.length;
-        for (i = 4; i < length; i++) {
-            //case equal and not calculated yet
-            if (points[i - 4].value === points[i].value && points[i].value !== 0 && !points[i - 4].calculated) {
-                return true;
-            } else {
-                if (points[i - 4].value === 0 && points[i].value !== 0) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
     //flow
     // get all points have value
     //each point
@@ -159,8 +125,10 @@ angular.module('app').controller('app.home-page.homePageCtrl', ['$scope', '$docu
                     }
               //      console.log('nextPosition: ' + nextPosition);
                     // merge if same value follow direct
-                    if (points[currentPostion].value === points[nextPosition].value) {
-
+                    if (points[currentPostion].value === points[nextPosition].value && !points[nextPosition].calculated) {
+                        tempPoints += points[nextPosition].value = points[currentPostion].value * 2;
+                        points[currentPostion].value = 0;
+                        points[nextPosition].calculated = true;
                     }
                     if (points[nextPosition].value !== 0) {
                         break;
@@ -181,51 +149,6 @@ angular.module('app').controller('app.home-page.homePageCtrl', ['$scope', '$docu
     }
 
 
-
-    function checkPossiableForMoveOrMerge(direct) {
-
-    }
-    function mergeValue(direct) {
-
-    }
-    function move() {
-        //
-    }
-    function arrowUp() {
-        var i, points = $scope.points, length = points.length, tempPosition;
-        for (i = 4; i < length; i++) {
-            tempPosition = undefined;
-            for (var t = i; t > 0; t = t - 4) {
-                if (points[t].value === 0) {
-                    tempPosition = t;
-                }
-                if (points[t].value !== 0 && tempPosition !== undefined) {
-                    break;
-                }
-            }
-            if (points[i - 4].value === points[i].value && !points[i - 4].calculated) {
-                points[i - 4].value = points[i].value * 2;
-                points[i - 4].calculated = true;
-                tempPoints += points[i - 4].value;
-                points[i].value = 0;
-            }
-            for (var j = i; j > 0; j = j - 4) {
-                if (points[j].value === 0) {
-                    tempPosition = j;
-                }
-                if (points[j].value !== 0 && tempPosition !== undefined) {
-                    break;
-                }
-            }
-            if (tempPosition) {
-                points[tempPosition].value = points[i].value;
-                points[i].value = 0;
-            }
-            //case equal and not calculated yet
-
-
-        }
-    }
 
     function createNewPoints() {
         $scope.points = [];
@@ -250,6 +173,11 @@ angular.module('app').controller('app.home-page.homePageCtrl', ['$scope', '$docu
         $scope.score = 0;
         tempPoints = 0;
         createNewPoints();
+        newRandom();
+        newRandom();
+        newRandom();
+        newRandom();
+        newRandom();
         newRandom();
         //  newRandom();
         reCheckClassValues();
@@ -277,11 +205,11 @@ angular.module('app').controller('app.home-page.homePageCtrl', ['$scope', '$docu
         }
         if (matched) {
             run1();
-            //$scope.score += tempPoints;
-            //tempPoints = 0;
-            //newRandom();
+            $scope.score += tempPoints;
+            tempPoints = 0;
+            newRandom();
             reCheckClassValues();
-            //clearCalculatedPoint();
+            clearCalculatedPoint();
             $scope.$digest();
         }
     });
